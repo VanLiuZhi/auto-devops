@@ -1,0 +1,14 @@
+# Requirements for auto-devops project
+
+# Core dependencies
+langchain-core>=0.1.0
+requests>=2.28.0
+
+# Web service dependencies
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+
+# Optional dependencies for specific modules
+# langchain-ollama>=0.1.0  # For Ollama integration
+# langchain-community>=0.0.10  # For community tools
