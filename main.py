@@ -1,16 +1,72 @@
-# 这是一个示例 Python 脚本。
+"""
+Auto DevOps 应用启动入口
+"""
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from config import settings
+from src.demo.web_service import router as chat_router
 
-# 按 Shift+F10 执行或将其替换为您的代码。
-# 按 双击 Shift 在所有地方搜索类、文件、工具窗口、操作和设置。
+
+def create_app() -> FastAPI:
+    """
+    创建FastAPI应用实例
+
+    Returns:
+        FastAPI: 配置好的应用实例
+    """
+    # 创建FastAPI应用
+    app = FastAPI(**settings.app_config)
+
+    # 添加CORS中间件
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # 注册路由
+    app.include_router(chat_router)
+
+    # 根路径信息
+    @app.get("/", include_in_schema=False)
+    async def root():
+        return {
+            "message": settings.APP_NAME,
+            "version": settings.APP_VERSION,
+            "docs": settings.DOCS_URL,
+            "health": f"{settings.API_PREFIX}/health"
+        }
+
+    return app
 
 
-def print_hi(name):
-    # 在下面的代码行中使用断点来调试脚本。
-    print(f'Hi, {name}')  # 按 Ctrl+F8 切换断点。
+def main():
+    """主函数：启动应用"""
+    server_config = settings.server_config
+
+    print("🚀 启动 Auto DevOps 服务...")
+    print(f"📍 服务地址: http://{server_config['host']}:{server_config['port']}")
+    print(f"📚 API文档: http://{server_config['host']}:{server_config['port']}{settings.DOCS_URL}")
+    print(f"🏥 健康检查: http://{server_config['host']}:{server_config['port']}{settings.API_PREFIX}/health")
+
+    if server_config.get("reload"):
+        # 开发模式：使用import string方式启动以支持热重载
+        uvicorn.run(
+            "main:create_app",
+            host=server_config["host"],
+            port=server_config["port"],
+            reload=True,
+            log_level=server_config["log_level"],
+            factory=True  # 指定使用工厂函数
+        )
+    else:
+        # 生产模式：直接运行应用实例
+        app = create_app()
+        uvicorn.run(app, **{k: v for k, v in server_config.items() if k != "reload"})
 
 
-# 按装订区域中的绿色按钮以运行脚本。
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助
+if __name__ == "__main__":
+    main()

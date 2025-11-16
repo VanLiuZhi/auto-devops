@@ -1,70 +1,74 @@
 # web_service.py
 """
-简单的web服务：使用真实的demo核心功能
+Web控制器层：处理HTTP请求和响应
 """
 import json
-import asyncio
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-import uvicorn
 
-# 导入真实的诊断核心
-from diagnosis_core import DiagnosisService
+from .diagnosis_core import DiagnosisService
 
 
+# 请求模型
 class ChatRequest(BaseModel):
     message: str
     user_id: str = None
 
 
-# 创建FastAPI应用
-app = FastAPI(title="故障诊断AI服务", description="基于真实demo核心的web服务")
-
-# 添加CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 响应模型
+class ChatResponse(BaseModel):
+    response: str
+    status: str
 
 
-@app.get("/")
-async def root():
-    return {"message": "故障诊断AI服务", "version": "real-demo"}
+class HealthResponse(BaseModel):
+    status: str
+    service: str
 
 
-@app.get("/health")
-async def health():
-    return {"status": "healthy", "service": "故障诊断AI"}
-
+# 创建路由器
+router = APIRouter(prefix="/api", tags=["chat"])
 
 # 创建诊断服务实例
 diagnosis_service = DiagnosisService(verbose=False)
 
 
-@app.post("/chat")
+@router.get("/", summary="根路径")
+async def root():
+    """根路径，返回服务信息"""
+    return {"message": "故障诊断AI服务", "version": "v1.0"}
+
+
+@router.get("/health", response_model=HealthResponse, summary="健康检查")
+async def health():
+    """健康检查接口"""
+    return HealthResponse(status="healthy", service="故障诊断AI")
+
+
+@router.post("/chat", response_model=ChatResponse, summary="同步聊天")
 async def chat(request: ChatRequest):
-    """同步聊天接口"""
+    """
+    同步聊天接口
+
+    - **message**: 用户输入的问题
+    - **user_id**: 用户ID（可选）
+    """
     try:
         result = await diagnosis_service.diagnose(request.message)
-        return {
-            "response": result,
-            "status": "success"
-        }
+        return ChatResponse(response=result, status="success")
     except Exception as e:
-        return {
-            "response": f"诊断出错: {str(e)}",
-            "status": "error"
-        }
+        return ChatResponse(response=f"诊断出错: {str(e)}", status="error")
 
 
-@app.post("/chat/stream")
+@router.post("/chat/stream", summary="流式聊天")
 async def chat_stream(request: ChatRequest):
-    """流式聊天接口"""
+    """
+    流式聊天接口，返回Server-Sent Events
+
+    - **message**: 用户输入的问题
+    - **user_id**: 用户ID（可选）
+    """
     async def generate():
         try:
             async for chunk in diagnosis_service.diagnose_stream(request.message):
@@ -86,7 +90,3 @@ async def chat_stream(request: ChatRequest):
             "Access-Control-Allow-Origin": "*",
         }
     )
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8002)
