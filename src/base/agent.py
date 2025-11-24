@@ -63,7 +63,8 @@ def knowledge_lookup(query: str) -> str:
 class GLMLLM(LLM):
     """使用智谱GLM-4.6大模型的LLM实现"""
 
-    api_key: str = "4b42d63c64aa4cd1a23b0ae0b5ba8a57.R4gzQuQlqJ51HA25"
+    # api_key: str = "4b42d63c64aa4cd1a23b0ae0b5ba8a57.R4gzQuQlqJ51HA25"
+    api_key: str = "xxx."
     base_url: str = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
     model: str = "glm-4.6"
 

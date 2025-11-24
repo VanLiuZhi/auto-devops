@@ -32,10 +32,21 @@ python main.py
 
 ### 3. 访问服务
 
+- **前端页面**: http://localhost:8002/
 - **API文档**: http://localhost:8002/docs
 - **健康检查**: http://localhost:8002/api/health
 - **聊天接口**: http://localhost:8002/api/chat
 - **流式聊天**: http://localhost:8002/api/chat/stream
+
+## 🎨 前端界面
+
+启动服务后访问 http://localhost:8002/ 即可使用美观的前端界面，包含：
+
+- **💬 智能对话**: 与AI助手实时交互
+- **🌊 流式响应**: 实时查看AI分析过程
+- **⚡ 快速操作**: 预设常用故障诊断场景
+- **📊 系统状态**: 实时监控服务健康状态
+- **📱 响应式设计**: 支持桌面和移动设备
 
 ## 📚 API使用
 

@@ -90,3 +90,34 @@ async def chat_stream(request: ChatRequest):
             "Access-Control-Allow-Origin": "*",
         }
     )
+
+
+@router.get("/chat/stream", summary="流式聊天(GET)")
+async def chat_stream_get(message: str, user_id: str = None):
+    """
+    流式聊天接口(GET方式)，支持前端EventSource
+
+    - **message**: 用户输入的问题 (查询参数)
+    - **user_id**: 用户ID (查询参数，可选)
+    """
+    async def generate():
+        try:
+            async for chunk in diagnosis_service.diagnose_stream(message):
+                yield f"data: {json.dumps(chunk, ensure_ascii=False)}\n\n"
+        except Exception as e:
+            error_chunk = {
+                "type": "error",
+                "message": str(e),
+                "status": "failed"
+            }
+            yield f"data: {json.dumps(error_chunk, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+        }
+    )
