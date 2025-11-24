@@ -3,6 +3,10 @@
 """
 import os
 from typing import Optional
+from dotenv import load_dotenv
+
+# 加载.env文件（如果存在）
+load_dotenv()
 
 
 class Settings:

@@ -90,17 +90,42 @@ auto-devops/
 
 ## 🔧 配置
 
+项目使用 `.env` 文件管理配置，支持环境变量自动读取。
+
+### 配置文件
+
 复制 `.env.example` 为 `.env` 并修改配置：
 
 ```bash
 cp .env.example .env
 ```
 
-配置项说明：
-- `HOST`: 服务监听地址 (默认: 0.0.0.0)
-- `PORT`: 服务端口 (默认: 8002)
-- `DEBUG`: 调试模式 (默认: true)
-- `RELOAD`: 热重载 (默认: true)
+### 配置项说明
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `HOST` | 0.0.0.0 | 服务监听地址 |
+| `PORT` | 8002 | 服务端口 |
+| `DEBUG` | true | 调试模式 |
+| `RELOAD` | true | 热重载（开发环境） |
+| `API_PREFIX` | /api | API路径前缀 |
+| `DOCS_URL` | /docs | API文档路径 |
+| `DIAGNOSIS_VERBOSE` | false | 诊断服务详细日志 |
+
+### 环境变量优先级
+
+1. 系统环境变量
+2. `.env` 文件中的变量
+3. 代码中的默认值
+
+### 配置加载
+
+配置通过 `python-dotenv` 库自动加载，在 `config.py` 中统一管理：
+
+```python
+from dotenv import load_dotenv
+load_dotenv()  # 自动加载.env文件
+```
 
 ## 🧪 测试
 
