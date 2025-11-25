@@ -220,8 +220,8 @@ print(f"意图识别: {analysis}")
 ## 📚 学习资源
 
 - [详细开发指南](MOCK_DEVELOPMENT_GUIDE.md)
-- [完整示例代码](../src/tmp/weather_agent_with_mock.py)
-- [快速启动脚本](../src/tmp/quick_start.py)
+- [完整示例代码](../src/old/tmp/weather_agent_with_mock.py)
+- [快速启动脚本](../src/old/tmp/quick_start.py)
 - [LangChain官方文档](https://python.langchain.com/)
 - [LangGraph文档](https://langchain-ai.github.io/langgraph/)
 
